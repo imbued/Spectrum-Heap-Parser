@@ -1,0 +1,76 @@
+AI = actor instance
+AF = actor file (i.e. overlay; code associated with the actor instance which also takes up space in the heap)
+
+Quick Spin (id 0035) AI + 0x15C has 4 bytes corresponding to damage flags. If we have the 0x80000000 bit set, then it counts as powder keg damage
+Deku Bubble (id 000F) AI + 0x130 has 4 bytes corresponding to damage flags. If we have the 0x80000000 bit set, then it counts as powder keg damage
+
+Spring Water (id 01AF)
+Bugs (id 017B)
+Fish (id 0017)
+Fairy (id 0010)
+Thunder (id 0035)
+
+Sizes (roughly):
+Fish AF: 0x28C0
+Bugs AF: 0x37F0
+Thunder AI: 0x1D0 -- AF is in irrelevant part of heap
+
+If doing a charged spin attack, but 0035 and 007B get allocated, but 0035 gets allocated first, so we can never use the 007B to help with 0035's placement in the heap.
+
+Spring Water AI + 0x15C = 0xF7CFFFFF -- static ** Hot Spring Water seems identical to regular Spring Water, same AI and same 0xF7CFFFFF
+Spring Water AI + 0x1C0 = OOB, spring water only has a size of about 0x1A0, so it's AI can't be used, but its AF (size roughly 0xDD0) gets allocated first, so we can use this in theory if we set up the heap properly
+Spring Water AF + 0x15C = 0xAFB20034 -- static *same for hot spring water
+Spring Water AF + 0x1C0 = 0x00000000 -- static *same for hot spring water
+
+Bugs AI + 0x15C = dynamic, seems to change every frame, most significant byte seems to be either 0x40 of 0x3F though, so it's never 0x80 (at least with the limited testing I did, idk how these values are determined)
+Bugs AI + 0x1C0 = 0x17052643 -- static
+Bugs AF + 0x15C = 0x8FBF0024 -- static
+Bugs AF + 0x1C0 = 0xAE20034C -- static
+
+Fish AI + 0x15C = 0x00000001 -- static
+Fish AI + 0x1C0 = 0x3F800000 -- static
+Fish AF + 0x15C = 0x44814000 -- static
+Fish AF + 0x1C0 = 0x0C03FB9C -- static
+
+Fairy AI + 0x15C = dynamic, most significant byte seems to either be 0x00, 0x3F, 0x40, or 0x41
+Fairy AI + 0x1C0 = 0x00000000 -- static
+Fairy AF will never be in a relevant part of the heap provided we have Tatl.
+
+Conclusion (English): 
+If using quickspin, our options for keg damage are:
+- Spring Water AI
+- Spring Water AF
+- Bugs AF
+
+If using deku bubble, our options for keg damage are:
+- Bugs AF
+
+---------------
+JP 1.1
+
+Spring Water AI + 0x15C = 0xF7CFFFFF
+Spring Water AI + 0x1C0 = OOB, AI only has size of about 0x1A0
+Spring Water AF + 0x15C = 0xAFB20034 -- static
+Spring Water AF + 0x1C0 = 0x00000000 -- static
+* hot spring water behaves the same as regular spring water, I double checked just to be sure
+
+Bugs AI + 0x15C = dynamic, most significant bit is roughly 0x3D, 0x3F, 0x40 (didn't check exhaustively)
+Bugs AI + 0x1C0 = 0x17052643 -- static
+Bugs AF + 0x15C = 0xAFB50054 -- static
+Bugs AF + 0x1C0 = 0x24140091 -- static -- first notable different from English that I've seen
+
+Fish AI + 0x15C = 0x00000001 -- static
+Fish AI + 0x1C0 = 0x3F800000 -- static
+Fish AF + 0x15C = 0x44814000 -- static
+Fish AF + 0x1C0 = 0x0C0402B8 -- static
+
+Fairy AI + 0x15C = dynamic, most significant byte seems to either be 0x00, 0x3F, 0x40, or 0x41
+Fairy AI + 0x1C0 = 0x00000000 -- static
+
+Conclusion (JP 1.1): 
+If using quickspin, our options for keg damage are:
+- Spring Water AI
+- Spring Water AF
+- Bugs AF
+
+It seems deku bubble with Bugs AF doesn't work on JP 1.1 as far as I can tell

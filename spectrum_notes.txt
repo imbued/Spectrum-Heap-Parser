@@ -1,0 +1,10 @@
+https://www.microsoft.com/en-us/download/details.aspx?id=26999 
+https://www.microsoft.com/en-us/download/details.aspx?id=8109
+
+both of thse had to be downloaded for hope_this_works.zip to work. I forget which ones, but the bizhawk is 32 and one of them needed x86
+
+chatpgt summary:
+
+For BizHawk 1.9.4, the two things to install were:
+1. DirectX End-User Runtimes (June 2010) — Microsoft download. Extract the package and run DXSETUP.exe.
+2. Visual C++ 2010 SP1 Redistributable (x86) — Microsoft download.
